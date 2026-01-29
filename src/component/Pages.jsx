@@ -1,4 +1,8 @@
 const Pages =({handlePageChange,pagination})=>{
+
+    // 預防性檢查--避免因為pagination尚未準備好而出現奇怪數字
+    if(!pagination||!pagination.total_pages) return null;
+    
     return (
         <>
             {/* {Pages start} */}

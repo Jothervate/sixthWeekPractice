@@ -31,7 +31,13 @@ function App() {
 
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [isAuth, setIsAuth] = useState(false);
-  const [products, setProducts] = useState([]);
+  // 新增載入狀態,避免頁面沒有進行更新
+  const [isLoading,setIsLoading] =useState(false);
+
+  // 分流：定義兩個不同的資料庫
+  const [adminProducts, setAdminProducts] = useState([]);  // 後端(產品編輯)管理用
+  const [clientProducts, setClientProducts] = useState([]); // 前台(產品列表)列表用
+
   const [templateData,setTemplateData]=useState(null);
   // 建立購物車資訊
   const [carts,setCarts]= useState([]);
@@ -42,7 +48,8 @@ function App() {
   const [modalType,setModalType]= useState('');
   
   // 取得頁面資訊
-  const [pagination,setPagination] =useState({});
+  const [adminPagination,setAdminPagination] = useState({});
+  const [clientPagination,setClientPagination]= useState({});
   
   // 是否上傳中
   const [isUploading,setIsUploading]= useState(false);
@@ -90,14 +97,34 @@ function App() {
   };
 
   // 取得產品資料
-  const getDatas = useCallback(async (page=1) => {
+  //多新增isAdmin-->為之後只想純取啟用產品做準備
+  // 取得資料函式（優化參數處理）
+  const getDatas = useCallback(async (page=1, isAdmin=true) => {
+    // 讀取資料為true
+    setIsLoading(true);
+
+    // 💡 依據模式清空對應的資料，避免「閃過舊資料」
+    if (isAdmin) setAdminProducts([]);
+    else setClientProducts([]);
+    
     try {
       // 注意：這裡補上了 ${API_PATH} 後面的斜線 /
-      const res = await axios.get(`${API_BASE}/api/${API_PATH}/admin/products?page=${page}`);
-      setProducts(res.data.products);
-      setPagination(res.data.pagination);
+      const path= isAdmin?`admin/products` : `products`;
+      const res = await axios.get(`${API_BASE}/api/${API_PATH}/${path}?page=${page}`);
+      if(isAdmin){
+        setAdminProducts(res.data.products);
+        setAdminPagination(res.data.pagination);
+      }else{
+        setClientProducts(res.data.products);
+        setClientPagination(res.data.pagination);
+      }
+      
+
     } catch (err) {
       alert(`取得產品失敗: ${err.response?.data?.message || err.message}`);
+    }finally{
+      // 無論成功與否,最後讀取功能都會變回false
+      setIsLoading(false);
     }
   },[]);
 
@@ -443,9 +470,10 @@ return (
               <Route 
                 path='/products'
                 element={<ProductPage 
-                    products={products}             // 傳遞產品列表資料
-                    pagination={pagination}         // 傳遞分頁資料
-                    getDatas={getDatas}             // 傳遞取得資料的函式
+                    isLoading={isLoading}
+                    products={clientProducts}             // 傳遞產品列表資料
+                    pagination={clientPagination}         // 傳遞分頁資料
+                    getDatas={(page)=>getDatas(page,false)}             // 傳遞取得資料的函式
                     openModal={openModal}           // 傳遞開啟 Modal 的函式
                     getTemplateData={getTemplateData} // 傳遞取得細節的函式
                     templateData={templateData}     // 傳遞目前選中的細節資料
@@ -458,11 +486,12 @@ return (
               <Route 
                 path='/productEdit' 
                 element={<ProductEdit
+                  isLoading={isLoading}
                   openModal={openModal}
                   checkLogin={checkLogin}
-                  products={products}
-                  pagination={pagination}
-                  getDatas={getDatas}/>} />
+                  products={adminProducts}
+                  pagination={adminPagination}
+                  getDatas={(page)=>getDatas(page,true)}/>} />
               <Route 
                 path='/cart'
                 element={<CartPage 
