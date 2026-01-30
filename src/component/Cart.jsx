@@ -1,4 +1,4 @@
-const Cart =({carts,removeTargetItem,clearCart,updateQty,cartItemTotal})=>{
+const Cart =({carts,removeTargetItem,clearCart,updateQty,cartItemTotal,isGetCarts})=>{
     
     return (<>
         <div className="col-md-12">
@@ -68,11 +68,20 @@ const Cart =({carts,removeTargetItem,clearCart,updateQty,cartItemTotal})=>{
                                 </tr>
                             ))
                         ):(
-                            <tr>
-                                <td colSpan="5" className="text-center text-muted">
-                                    正在載入產品或尚無產品資料...
-                                </td>
-                            </tr>
+                            isGetCarts?(
+                                <tr>
+                                    <td colSpan="5" className="text-center text-muted">
+                                        尚無無產品資料!
+                                    </td>
+                                </tr>
+                            ):(
+                                <tr>
+                                    <td colSpan="5" className="text-center text-muted">
+                                        載入產品失敗!
+                                    </td>
+                                </tr>
+                            )
+                            
                         )   
                     }
                 </tbody>

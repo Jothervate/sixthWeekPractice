@@ -2,7 +2,7 @@
 import Pages from "./Pages";
 import { Link } from 'react-router-dom'; //改成用鏈結來帶入詳細頁面
 
-const ProductList=({checkLogin,products,pagination,onChangePages,addToCart,isLoading})=>{
+const ProductList=({checkLogin,products,pagination,onChangePages,addToCart,isLoading,isGetProducts})=>{
 
     // 換頁
     const handlePageChange=async(e,page)=>{
@@ -10,16 +10,20 @@ const ProductList=({checkLogin,products,pagination,onChangePages,addToCart,isLoa
         onChangePages(page);
     };
 
-    return (
-        <>
-        {
-            isLoading?(
+    // 根據條件確認要顯示內容
+    let content;
+
+    if(isGetProducts){
+        if(isLoading){
+            content =(
                 <div className="d-flex justify-content-center" style={{marginTop: '100px'}}>
                     <div className="spinner-border text-primary" role="status">
                         <span className="visually-hidden">Loading...</span>
                     </div>
                 </div>
-            ):(
+            )
+        }else{
+            content= (
                 <div className="col-md-12">
                     <div className="d-flex justify-content-end mb-3">
                         <div className="d-flex gap-2">
@@ -67,7 +71,7 @@ const ProductList=({checkLogin,products,pagination,onChangePages,addToCart,isLoa
                         ) : (
                             <tr>
                             <td colSpan="5" className="text-center text-muted">
-                                正在載入產品或尚無產品資料...
+                                尚無產品資料!
                             </td>
                             </tr>
                         )}
@@ -81,6 +85,22 @@ const ProductList=({checkLogin,products,pagination,onChangePages,addToCart,isLoa
                     {/* {Pages end} */}
                 </div>
             )
+        }
+    }else{
+        content=(
+            <div className="d-flex justify-content-center" style={{marginTop: '100px'}}>
+                    <div className="spinner-border text-primary" role="status">
+                        <h1 className="text-danger">載入失敗!</h1>
+                    </div>
+                </div>
+        )
+    };
+    
+
+    return (
+        <>
+        {
+            {content}
         }
         </>
     )

@@ -41,6 +41,8 @@ function App() {
   const [templateData,setTemplateData]=useState(null);
   // 建立購物車資訊
   const [carts,setCarts]= useState([]);
+  // 是否取得資訊成功
+  const [isLoadingSuccess,setIsLoadingSuccess]= useState(false);
 
   // 設置初始表單內容
   const [templateProduct,setTemplateProduct]= useState(NEW_PRODUCT_DATA); 
@@ -119,9 +121,11 @@ function App() {
         setClientPagination(res.data.pagination);
       }
       
+      setIsLoadingSuccess(true);
 
     } catch (err) {
       alert(`取得產品失敗: ${err.response?.data?.message || err.message}`);
+      setIsLoadingSuccess(false);
     }finally{
       // 無論成功與否,最後讀取功能都會變回false
       setIsLoading(false);
@@ -371,6 +375,7 @@ function App() {
         }
     };
 
+
     // 處理購物車資訊
     const addToCart = (product) => {
       setCarts((prevCart) => {
@@ -480,6 +485,7 @@ return (
                     setTemplateData={setTemplateData} // 傳遞更新細節資料的函式
                     checkLogin={checkLogin}         // 傳遞檢查登入的函式
                     addToCart={addToCart}
+                    isGetProducts={isLoadingSuccess}
                   />}/>
               {/* 👇 加入這一行，注意路徑要跟你的 Link 一致 */}
               <Route path='/product/:id' element={<DetailPage />} />
@@ -500,7 +506,8 @@ return (
                   removeTargetItem={removeTargetItem}
                   clearCart={clearCart}
                   updateQty={updateQty}
-                  cartItemTotal={cartItemTotal}/>}/>
+                  cartItemTotal={cartItemTotal}
+                  isGetCarts={isLoadingSuccess}/>}/>
 
             </Routes>
           </div>

@@ -1,6 +1,6 @@
 import Cart from "../component/Cart";
 
-const CartPage=({checkLogin,carts,removeTargetItem,clearCart,updateQty,cartItemTotal})=>{
+const CartPage=({checkLogin,carts,removeTargetItem,clearCart,updateQty,cartItemTotal,isGetCart})=>{
     return (
         <>
             <h1 className="text-dark text-center">
@@ -15,7 +15,8 @@ const CartPage=({checkLogin,carts,removeTargetItem,clearCart,updateQty,cartItemT
                         removeTargetItem={removeTargetItem}
                         clearCart={clearCart}
                         updateQty={updateQty}
-                        cartItemTotal={cartItemTotal}/>
+                        cartItemTotal={cartItemTotal}
+                        isGetCart={isGetCart}/>
                 </div>
             </div>
         </>
