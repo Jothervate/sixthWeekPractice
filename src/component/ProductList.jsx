@@ -89,8 +89,9 @@ const ProductList=({checkLogin,products,pagination,onChangePages,addToCart,isLoa
     }else{
         content=(
             <div className="d-flex justify-content-center" style={{marginTop: '100px'}}>
-                    <div className="spinner-border text-primary" role="status">
-                        <h1 className="text-danger">載入失敗!</h1>
+                    <div className="bi bi-exclamation-octagon text-danger" style={{fontSize:"40px"}}>
+                        <h1 className="text-dange mt-3">載入失敗!</h1>
+                        <p className="text-muted">請確認網路連線或API網址是否正確?</p>
                     </div>
                 </div>
         )
@@ -99,9 +100,7 @@ const ProductList=({checkLogin,products,pagination,onChangePages,addToCart,isLoa
 
     return (
         <>
-        {
             {content}
-        }
         </>
     )
 }

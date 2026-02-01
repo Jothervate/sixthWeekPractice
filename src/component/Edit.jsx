@@ -1,23 +1,27 @@
 import { NEW_PRODUCT_DATA } from "../Constants/config";
 import Pages from "./Pages";
 
-const Edit=({openModal,products,checkLogin,pagination,onChangePages,isLoading})=>{
+const Edit=({openModal,products,checkLogin,pagination,onChangePages,isLoading,isGetDatas})=>{
     // 換頁
     const handlePageChange=async(e,page)=>{
         e.preventDefault();
         onChangePages(page);
     };
-    
-    return (
-        <>
-        {
-            isLoading? (
+
+    //根據載入內容決定傳入資訊內容
+    let content;
+
+    if(isGetDatas){
+        if(isLoading){
+            content= (
                 <div className="d-flex justify-content-center" style={{marginTop: '100px'}}>
                     <div className="spinner-border text-primary" role="status">
                         <span className="visually-hidden">Loading...</span>
                     </div>
                 </div>
-            ):(
+            )
+        }else{
+            content=(
                 <div className="col-md-12">
                     <div className="d-flex justify-content-end mb-3">
                         <div className="d-flex gap-2">
@@ -89,9 +93,24 @@ const Edit=({openModal,products,checkLogin,pagination,onChangePages,isLoading})=
                         handlePageChange={handlePageChange}
                         pagination={pagination}/>
                     {/* {Pages end} */}
-                    </div>
+                </div>
             )
         }
+    }else{
+        content=(
+            <div className="d-flex justify-content-center" style={{marginTop: '100px'}}>
+                    <div className="bi bi-exclamation-octagon text-danger" style={{fontSize:"40px"}}>
+                        <h1 className="text-dange mt-3">載入失敗!</h1>
+                        <p className="text-muted">請確認網路連線或API網址是否正確?</p>
+                    </div>
+                </div>
+        )
+    }
+
+
+    return (
+        <>
+            {content}
         </>
     )
 }

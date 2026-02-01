@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 
-const DeleteModal = forwardRef(({ templateProduct, updateProductData, closeModal }, ref) => {
+const DeleteModal = forwardRef(({ templateProduct, updateProductData, closeModal ,isDeleteItem}, ref) => {
     return (
         <div
         id="delProductModal"
@@ -22,10 +22,12 @@ const DeleteModal = forwardRef(({ templateProduct, updateProductData, closeModal
                 確認是否刪除產品：<span className="text-dark">{templateProduct?.title}</span>?
                 </h3>
             </div>
-            <div className='d-flex justify-content-center align-items-center mb-5 gap-5'>
-                <button type='button' className='btn btn-danger px-4' onClick={updateProductData}>刪除</button>
-                <button type='button' className='btn btn-secondary px-4' onClick={closeModal}>取消</button>
-            </div>
+            <fieldset disabled={isDeleteItem}>
+                <div className='d-flex justify-content-center align-items-center mb-5 gap-5'>
+                    <button type='button' className='btn btn-danger px-4' onClick={updateProductData}>刪除</button>
+                    <button type='button' className='btn btn-secondary px-4' onClick={closeModal}>取消</button>
+                </div>
+            </fieldset>
             </div>
         </div>
         </div>

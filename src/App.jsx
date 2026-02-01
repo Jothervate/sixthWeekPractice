@@ -1,23 +1,17 @@
 import { useState, useRef, useEffect ,useCallback} from 'react';
-import { Route,Routes,Link ,useNavigate} from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import axios from "axios";
 import * as bootstrap from "bootstrap";
 
 import { NEW_PRODUCT_DATA,API_BASE,API_PATH } from './Constants/config';
 
-import Not_logging from './component/Not_logging';
-import ProductEdit from './pages/ProductEdit';
+
 import ProductModal from './component/ProductModal';
 import DeleteModal from './component/Delete';
+// 路由+Link
+import AppRoute from './Route/AppRoute';
+import Navbar from './component/Navbar';
 
-
-
-// 分頁頁面
-import Home from './pages/Home';
-import CartPage from './pages/CartPage';
-import DetailPage from './pages/DetailPage';
-import ProductPage from './pages/ProductPage';
-import Error from './pages/Error';
 
 
 
@@ -38,9 +32,16 @@ function App() {
   const [adminProducts, setAdminProducts] = useState([]);  // 後端(產品編輯)管理用
   const [clientProducts, setClientProducts] = useState([]); // 前台(產品列表)列表用
 
+  // 查看細節內容
   const [templateData,setTemplateData]=useState(null);
+
   // 建立購物車資訊
   const [carts,setCarts]= useState([]);
+
+  // 是否正在刪除產品
+  const [isDeleteItem,setIsDeleteItem]= useState(false);
+
+
   // 是否取得資訊成功
   const [isLoadingSuccess,setIsLoadingSuccess]= useState(false);
 
@@ -114,17 +115,17 @@ function App() {
       const path= isAdmin?`admin/products` : `products`;
       const res = await axios.get(`${API_BASE}/api/${API_PATH}/${path}?page=${page}`);
       if(isAdmin){
-        setAdminProducts(res.data.products);
-        setAdminPagination(res.data.pagination);
+        setAdminProducts(res?.data?.products);
+        setAdminPagination(res?.data?.pagination);
       }else{
-        setClientProducts(res.data.products);
-        setClientPagination(res.data.pagination);
+        setClientProducts(res?.data?.products);
+        setClientPagination(res?.data?.pagination);
       }
       
       setIsLoadingSuccess(true);
 
     } catch (err) {
-      alert(`取得產品失敗: ${err.response?.data?.message || err.message}`);
+      alert(`取得產品失敗: ${err.response?.data?.message || err?.message}`);
       setIsLoadingSuccess(false);
     }finally{
       // 無論成功與否,最後讀取功能都會變回false
@@ -321,10 +322,12 @@ function App() {
       // 3. 執行請求
       try {
         // 注意：delete 的呼叫方式與其他不同
-        method === "delete" 
-          ? await axios.delete(url) 
-          : await axios[method](url, payload);
-
+        if(method==="delete"){
+          await axios.delete(url);
+          setIsDeleteItem(true)
+        }else{
+          await axios[method](url,payload)
+        };
         alert(`${status}資料成功!`);
         await getDatas();
         closeModal();
@@ -332,6 +335,8 @@ function App() {
         const errorMsg = err.response?.data?.message || err.message;
         console.error(`${status}失敗：`, errorMsg);
         alert(`${status}失敗：${errorMsg}`);
+      }finally{
+        setIsDeleteItem(false);
       }
     };
 
@@ -378,6 +383,16 @@ function App() {
 
     // 處理購物車資訊
     const addToCart = (product) => {
+
+      // 先確認取得資料上是否已經成功
+      if (!isLoadingSuccess){
+        console.warn("無法取得資訊內容!");
+        return;
+      } 
+
+      // 確認資訊內容是否存在
+      if(!product?.id) return;
+      
       setCarts((prevCart) => {
         // 1. 使用可選連綴 (?.) 預防 prevCart 裡有 undefined 的情況
         const isItemInCart = prevCart.find((item) => item?.id === product.id);
@@ -447,74 +462,33 @@ function App() {
 
 return (
   <>
-      {!isAuth ? (
-        <Not_logging
+      {isAuth && <Navbar />}
+      <div className='container'>
+        <AppRoute 
+          isAuth={isAuth}
+          isLoading={isLoading}
           formData={formData}
-          setFormData={setFormData}
           setIsAuth={setIsAuth}
-          
-        />
-      ) : (
-
-        <>
-          <div>
-            <nav className='d-flex align-item-center justify-content-center  gap-3' style={{padding:"20px"}}>
-              <Link to='/' className='pe-3 border-end'>首頁</Link>
-              <Link to='/products'  className='pe-3 border-end'>產品列表</Link>
-              <Link to='/productEdit' className='pe-3 border-end'>產品編輯</Link>
-              <Link to='/cart'  className='pe-3 border-end'>購物車</Link>
-              
-            </nav>
-            <hr />
-            <Routes>
-              <Route
-                path='/'
-                element={<Home 
-                  checkLogin={checkLogin}/>}/>
-              
-              <Route 
-                path='/products'
-                element={<ProductPage 
-                    isLoading={isLoading}
-                    products={clientProducts}             // 傳遞產品列表資料
-                    pagination={clientPagination}         // 傳遞分頁資料
-                    getDatas={(page)=>getDatas(page,false)}             // 傳遞取得資料的函式
-                    openModal={openModal}           // 傳遞開啟 Modal 的函式
-                    getTemplateData={getTemplateData} // 傳遞取得細節的函式
-                    templateData={templateData}     // 傳遞目前選中的細節資料
-                    setTemplateData={setTemplateData} // 傳遞更新細節資料的函式
-                    checkLogin={checkLogin}         // 傳遞檢查登入的函式
-                    addToCart={addToCart}
-                    isGetProducts={isLoadingSuccess}
-                  />}/>
-              {/* 👇 加入這一行，注意路徑要跟你的 Link 一致 */}
-              <Route path='/product/:id' element={<DetailPage />} />
-              <Route 
-                path='/productEdit' 
-                element={<ProductEdit
-                  isLoading={isLoading}
-                  openModal={openModal}
-                  checkLogin={checkLogin}
-                  products={adminProducts}
-                  pagination={adminPagination}
-                  getDatas={(page)=>getDatas(page,true)}/>} />
-              <Route 
-                path='/cart'
-                element={<CartPage 
-                  checkLogin={checkLogin}
-                  carts={carts}
-                  removeTargetItem={removeTargetItem}
-                  clearCart={clearCart}
-                  updateQty={updateQty}
-                  cartItemTotal={cartItemTotal}
-                  isGetCarts={isLoadingSuccess}/>}/>
-
-            </Routes>
-          </div>
-          
-        </>
-      )}
-
+          setFormData={setFormData}
+          clientProducts={clientProducts}
+          clientPagination={clientPagination}
+          getDatas={getDatas}
+          openModal={openModal}
+          getTemplateData={getTemplateData}
+          templateData={templateData}
+          setTemplateData={setTemplateData}
+          checkLogin={checkLogin}
+          addToCart={addToCart}
+          isLoadingSuccess={isLoadingSuccess}
+          adminProducts={adminProducts}
+          adminPagination={adminPagination}
+          carts={carts}
+          removeTargetItem={removeTargetItem}
+          clearCart={clearCart}
+          updateQty={updateQty}
+          cartItemTotal={cartItemTotal}
+      />
+      </div>
       {/* {Modal} */}
       <ProductModal 
         ref={productModalRef}
@@ -535,6 +509,7 @@ return (
         templateProduct={templateProduct}
         updateProductData={updateProductData}
         closeModal={closeModal}
+        isDeleteItem={isDeleteItem}
       />
       {/* {Modal end} */}
     </>

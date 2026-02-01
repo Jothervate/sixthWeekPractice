@@ -3,7 +3,7 @@ import Edit from "../component/Edit";
 
 
 
-const ProductEdit=({openModal,checkLogin,products,pagination,getDatas,isLoading})=>{
+const ProductEdit=({getDatas,openModal,checkLogin,products,pagination,...props})=>{
     // 更新Data資料內容
     useEffect(()=>{
         getDatas(1);
@@ -21,7 +21,7 @@ const ProductEdit=({openModal,checkLogin,products,pagination,getDatas,isLoading}
                         products={products}
                         pagination={pagination}
                         onChangePages={getDatas}
-                        isLoading={isLoading}
+                        {...props}
                     />
                 </div>
             </div>

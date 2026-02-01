@@ -57,13 +57,13 @@ const ProductModal = forwardRef(({
                                 <label htmlFor="imageUrl" className="form-label">輸入圖片網址</label>
                                 <input
                                     type="text" id="imageUrl" name="imageUrl" className="form-control"
-                                    placeholder="請輸入圖片連結" value={templateProduct.imageUrl}
+                                    placeholder="請輸入圖片連結" value={templateProduct?.imageUrl}
                                     onChange={handleModalInputChange}
                                 />
                                 </div>
                             </fieldset>
                             
-                            <img className="img-fluid" src={templateProduct.imageUrl || null} alt="主圖" />
+                            <img className="img-fluid" src={templateProduct?.imageUrl || null} alt="主圖" />
                             <hr />
                             <div className="row row-cols-2 g-4">
                             {(templateProduct?.imagesUrl || [""]).map((url, index) => (

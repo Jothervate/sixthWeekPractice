@@ -1,6 +1,6 @@
 {
   "name": "sixthWeekPractice",
-  "homepage":"https://github.com/Jothervate/sixthWeekPractice",
+  "homepage": "https://github.com/Jothervate/sixthWeekPractice",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,14 +9,15 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build", 
-    "deploy": "gh-pages -d dist"   
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "axios": "^1.13.2",
     "bootstrap": "^5.3.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-hook-form": "^7.71.1",
     "react-router-dom": "^7.13.0",
     "sass": "^1.97.2"
   },

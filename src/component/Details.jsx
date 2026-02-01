@@ -28,7 +28,7 @@ const Details = ({ item, onClose }) => {
                 <p className="text-muted">商品內容：{item.content}</p>
 
                 <div className="h5">
-                月租金：
+                價格：
                 <del className="text-secondary small me-2">{item.origin_price}</del>
                 <span className="text-danger">{item.price} 元</span>
                 </div>
