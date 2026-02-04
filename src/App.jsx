@@ -30,6 +30,9 @@ function App() {
   // 新增載入狀態,避免頁面沒有進行更新
   const [isLoading,setIsLoading] =useState(false);
 
+  // 新增檢查Token的狀態,避免畫面不同步
+  const [isAuthChecking, setIsAuthChecking] = useState(true); // 預設為 true，代表一開始就在檢查
+
   // 分流：定義兩個不同的資料庫
   const [adminProducts, setAdminProducts] = useState([]);  // 後端(產品編輯)管理用
   const [clientProducts, setClientProducts] = useState([]); // 前台(產品列表)列表用
@@ -142,8 +145,10 @@ function App() {
   useEffect(() => {
     const token = getCookie("hexToken");
 
+    // 如果根本沒有任何金鑰,驗證直接結束
     if (!token) {
         setIsAuth(false);
+        setIsAuthChecking(false);
         return;
       };
 
@@ -165,6 +170,8 @@ function App() {
         } catch (err) {
           console.error("驗證失敗", err);
           setIsAuth(false);
+        }finally{
+          setIsAuthChecking(false);
         }
       };
       checkAuth();
@@ -503,65 +510,75 @@ function App() {
     }
 
     
-
-
-
-
 return (
   <>
-      {isAuth && <Navbar />}
-      <div className='container'>
-        <AppRoute 
-          isAuth={isAuth}
-          isLoading={isLoading}
-          formData={formData}
-          setIsAuth={setIsAuth}
-          setFormData={setFormData}
-          clientProducts={clientProducts}
-          clientPagination={clientPagination}
-          getDatas={getDatas}
-          openModal={openModal}
-          getTemplateData={getTemplateData}
-          templateData={templateData}
-          setTemplateData={setTemplateData}
-          checkLogin={checkLogin}
-          addToCart={addToCart}
-          isLoadingSuccess={isLoadingSuccess}
-          adminProducts={adminProducts}
-          adminPagination={adminPagination}
-          getCart={getCart}
-          total={total}
-          finalTotal={finalTotal}
-          carts={carts}
-          removeTargetItem={removeTargetItem}
-          clearCart={clearCart}
-          updateQty={updateQty}
-          resetCart={resetCart}
-      />
-      </div>
+    {/* 先確認是否有載入資料中 */}
+      {
+        isAuthChecking?(
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          {/* 這裡可以放 Bootstrap 的 Spinner */}
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>):(
+          <>
+            {/* 如果載入完成,則會正常顯示內容 */}
+            {isAuth && <Navbar />}
+              <div className='container'>
+                <AppRoute 
+                  isAuth={isAuth}
+                  isLoading={isLoading}
+                  formData={formData}
+                  setIsAuth={setIsAuth}
+                  setFormData={setFormData}
+                  clientProducts={clientProducts}
+                  clientPagination={clientPagination}
+                  getDatas={getDatas}
+                  openModal={openModal}
+                  getTemplateData={getTemplateData}
+                  templateData={templateData}
+                  setTemplateData={setTemplateData}
+                  checkLogin={checkLogin}
+                  addToCart={addToCart}
+                  isLoadingSuccess={isLoadingSuccess}
+                  adminProducts={adminProducts}
+                  adminPagination={adminPagination}
+                  getCart={getCart}
+                  total={total}
+                  finalTotal={finalTotal}
+                  carts={carts}
+                  removeTargetItem={removeTargetItem}
+                  clearCart={clearCart}
+                  updateQty={updateQty}
+                  resetCart={resetCart}
+              />
+              </div>
+            </>
+      )}  
       {/* {Modal} */}
-      <ProductModal 
-        ref={productModalRef}
-        modalType={modalType}
-        templateProduct={templateProduct}
-        handleModalInputChange={handleModalInputChange}
-        handleModalImageChange={handleModalImageChange}
-        addNewImages={addNewImages}
-        removeImages={removeImages}
-        updateProductData={updateProductData}
-        closeModal={closeModal}
-        uploadImage={uploadImage}
-        isUploading={isUploading}
-      />
+        <ProductModal 
+          ref={productModalRef}
+          modalType={modalType}
+          templateProduct={templateProduct}
+          handleModalInputChange={handleModalInputChange}
+          handleModalImageChange={handleModalImageChange}
+          addNewImages={addNewImages}
+          removeImages={removeImages}
+          updateProductData={updateProductData}
+          closeModal={closeModal}
+          uploadImage={uploadImage}
+          isUploading={isUploading}
+        />
 
-      <DeleteModal 
-        ref={delProductModalRef}
-        templateProduct={templateProduct}
-        updateProductData={updateProductData}
-        closeModal={closeModal}
-        isDeleteItem={isDeleteItem}
-      />
-      {/* {Modal end} */}
+        <DeleteModal 
+          ref={delProductModalRef}
+          templateProduct={templateProduct}
+          updateProductData={updateProductData}
+          closeModal={closeModal}
+          isDeleteItem={isDeleteItem}
+        />
+        {/* {Modal end} */}
+              
     </>
   );
 }
