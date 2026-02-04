@@ -47,6 +47,8 @@ const Not_logging = ({ setIsAuth }) => {
 
     return (
         <div className="container login"> 
+            <h3 className="mt-5 text-secondary">"Demo Project only. Do NOT enter real credentials."</h3>
+            <h3 className="mt-5 text-secondary">（僅供練習，請勿輸入真實帳號密碼。）</h3>
             <h1 className="mt-5">請先登入</h1>
             <form className="form-floating form-signin" onSubmit={handleSubmit(onLogin)}>
                 <div className="mb-3">
