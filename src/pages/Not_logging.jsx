@@ -7,7 +7,9 @@ import { useForm } from "react-hook-form";
 
 const Not_logging = ({ setIsAuth }) => {
     // 💡 記得要把 errors 拿出來用
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        mode:"onTouched",
+    });
     const navigate = useNavigate();
 
     const onLogin = async (data) => {
